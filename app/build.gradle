@@ -18,7 +18,6 @@ android {
 
 
   compileSdkVersion rootProject.ext.android.compileSdkVersion
-  buildToolsVersion rootProject.ext.android.buildToolsVersion
   defaultConfig {
     applicationId rootProject.ext.android.applicationId
     minSdkVersion rootProject.ext.android.minSdkVersion
@@ -78,82 +77,42 @@ android {
   dexOptions {
     jumboMode true
   }
-
-
-  configurations.all {
-    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
-      def requested = details.requested
-      if (requested.group == 'com.android.support') {
-        if (!requested.name.startsWith("multidex")) {
-          details.useVersion rootProject.ext.android.buildToolsVersion
-        }
-      }
-    }
-  }
 }
-
 dependencies {
   implementation fileTree(dir: 'libs', include: ['*.jar'])
-  implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
-  implementation rootProject.ext.dependencies["support-v4"]
-  implementation rootProject.ext.dependencies["appcompat-v7"]
-  implementation rootProject.ext.dependencies["design"]
-  implementation rootProject.ext.dependencies["cardview"]
-
-  implementation rootProject.ext.dependencies["retrofit2"]
-  implementation rootProject.ext.dependencies["converter-scalars"]
-  implementation rootProject.ext.dependencies["converter-gson"]
-  implementation rootProject.ext.dependencies["adapter-rxjava2"]
-
-  implementation rootProject.ext.dependencies["rxCache"]
-  implementation rootProject.ext.dependencies["Jolyglot-gson"]
-
-  implementation rootProject.ext.dependencies["rxjava"]
-  implementation rootProject.ext.dependencies["rxandroid"]
-  implementation rootProject.ext.dependencies["rxbinding2"]
-  implementation rootProject.ext.dependencies["rxkotlin"]
-  implementation rootProject.ext.dependencies.rxlifecycle2
-  implementation rootProject.ext.dependencies.rxlifecomponents
-
-  implementation rootProject.ext.dependencies["dagger"]
-  implementation rootProject.ext.dependencies["dagger-support"]
-  kapt rootProject.ext.dependencies["dagger-compiler"]
-
-  implementation rootProject.ext.dependencies["fragmentation"]
-  implementation rootProject.ext.dependencies["butterknife"]
-  implementation rootProject.ext.dependencies["butterknife-compiler"]
-  implementation rootProject.ext.dependencies["ultra-ptr"]
-  implementation rootProject.ext.dependencies["bottom-bar"]
-  implementation rootProject.ext.dependencies["BaseAdapterHelper"]
-
-  implementation rootProject.ext.dependencies["glide"]
-  implementation rootProject.ext.dependencies["banner"]
-  implementation rootProject.ext.dependencies["viewanimator"]
-  implementation rootProject.ext.dependencies["tablayout"]
-  implementation rootProject.ext.dependencies["FlycoDialog"]
-  implementation rootProject.ext.dependencies["richtext"]
-  implementation rootProject.ext.dependencies["transformations"]
-  implementation rootProject.ext.dependencies["PhotoView"]
-  implementation rootProject.ext.dependencies["videoplayer"]
-  implementation rootProject.ext.dependencies["lottie"]
-  implementation rootProject.ext.dependencies["progressbar"]
-  implementation rootProject.ext.dependencies["transitionhelper"]
-  implementation rootProject.ext.dependencies["swipebacklayout"]
-  implementation rootProject.ext.dependencies["gif-drawable"]
-  implementation rootProject.ext.dependencies["eventbus"]
-  implementation rootProject.ext.dependencies["litepal"]
-  implementation rootProject.ext.dependencies["retrolambda"]
-
-
-
-
-  implementation rootProject.ext.dependencies["logger"]
-  implementation rootProject.ext.dependencies["leakcanary"]
-  implementation rootProject.ext.dependencies["canary-no-op"]
-  implementation project(":multiple-status-view")
-
-  implementation rootProject.ext.dependencies["constraint-layout"]
   testImplementation 'junit:junit:4.12'
   androidTestImplementation 'com.android.support.test:runner:1.0.1'
-  androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+  androidTestImplementation ('com.android.support.test.espresso:espresso-core:3.0.1'){
+    exclude group:'com.android.support', module: 'support-annotations'
+  }
+
+  //support
+  implementation rootProject.ext.supportLibs
+
+  //网络请求
+  implementation rootProject.ext.networkLibs
+
+  //Rxjava
+  implementation rootProject.ext.rxjavaLibs
+
+  //其他第三方
+  implementation rootProject.ext.thirdLibs
+
+  // APT dependencies(Kotlin内置的注解处理器)
+  kapt rootProject.ext.annotationPrecessorLibs
+
+
+  // 底部菜单
+  implementation('com.flyco.tablayout:FlycoTabLayout_Lib:2.1.0@aar') {
+    exclude group: 'com.android.support', module: 'support-v4'
+  }
+
+  implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+  implementation project(':multiple-status-view')
+  //GlideOkHttp
+  implementation(rootProject.ext.glideOkhttp) {
+    exclude group: 'glide-parent'
+  }
+
+
 }
