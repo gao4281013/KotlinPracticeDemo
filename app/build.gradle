@@ -7,80 +7,153 @@ apply plugin: 'kotlin-android-extensions'
 
 
 android {
-    compileSdkVersion rootProject.ext.android.compileSdkVersion
-    buildToolsVersion rootProject.ext.android.buildToolsVersion
-    defaultConfig {
-        applicationId rootProject.ext.android.applicationId
-        minSdkVersion rootProject.ext.android.minSdkVersion
-        targetSdkVersion rootProject.ext.android.targetSdkVersion
-        versionCode rootProject.ext.android.versionCode
-        versionName rootProject.ext.android.versionName
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+  signingConfigs {
+    config {
+      keyAlias 'kpdo'
+      keyPassword 'a123456'
+      storeFile file('../kotlin_p_demo.jks')
+      storePassword 'ktmp123456'
     }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+  }
+
+
+  compileSdkVersion rootProject.ext.android.compileSdkVersion
+  buildToolsVersion rootProject.ext.android.buildToolsVersion
+  defaultConfig {
+    applicationId rootProject.ext.android.applicationId
+    minSdkVersion rootProject.ext.android.minSdkVersion
+    targetSdkVersion rootProject.ext.android.targetSdkVersion
+    versionCode rootProject.ext.android.versionCode
+    versionName rootProject.ext.android.versionName
+    multiDexEnabled true
+    testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    javaCompileOptions {
+      annotationProcessorOptions {
+        includeCompileClasspath true
+      }
+    }
+    signingConfig signingConfigs.config
+    // 实现毛玻璃那种透明的效果需要添加的库
+    renderscriptTargetApi 19
+    renderscriptSupportModeEnabled true // Enable RS support
+
+    ndk {
+
+      //APP的build.gradle设置支持的SO库架构
+      abiFilters 'armeabi', 'armeabi-v7a', 'x86'
+    }
+  }
+  buildTypes {
+    debug {
+      minifyEnabled false
+      debuggable true
+      signingConfig signingConfigs.config
+    }
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+      debuggable false
+      signingConfig signingConfigs.config
+      zipAlignEnabled true
+    }
+  }
+
+
+  // 自定义输出配置
+  android.applicationVariants.all { variant ->
+    variant.outputs.all {
+      outputFileName = "kotlin_practise_v${variant.versionName}_${variant.name}.apk"
+    }
+  }
+
+  compileOptions {
+    targetCompatibility JavaVersion.VERSION_1_8
+    sourceCompatibility JavaVersion.VERSION_1_8
+  }
+  productFlavors {
+  }
+
+
+
+  dexOptions {
+    jumboMode true
+  }
+
+
+  configurations.all {
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+      def requested = details.requested
+      if (requested.group == 'com.android.support') {
+        if (!requested.name.startsWith("multidex")) {
+          details.useVersion rootProject.ext.android.buildToolsVersion
         }
+      }
     }
+  }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
-    implementation rootProject.ext.dependencies["support-v4"]
-    implementation rootProject.ext.dependencies["appcompat-v7"]
-    implementation rootProject.ext.dependencies["design"]
-    implementation rootProject.ext.dependencies["recyclerview"]
-    implementation rootProject.ext.dependencies["cardview"]
+  implementation fileTree(dir: 'libs', include: ['*.jar'])
+  implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+  implementation rootProject.ext.dependencies["support-v4"]
+  implementation rootProject.ext.dependencies["appcompat-v7"]
+  implementation rootProject.ext.dependencies["design"]
+  implementation rootProject.ext.dependencies["cardview"]
 
-    implementation rootProject.ext.dependencies["retrofit2"]
-    implementation rootProject.ext.dependencies["converter-scalars"]
-    implementation rootProject.ext.dependencies["converter-gson"]
-    implementation rootProject.ext.dependencies["adapter-rxjava2"]
+  implementation rootProject.ext.dependencies["retrofit2"]
+  implementation rootProject.ext.dependencies["converter-scalars"]
+  implementation rootProject.ext.dependencies["converter-gson"]
+  implementation rootProject.ext.dependencies["adapter-rxjava2"]
 
-    implementation rootProject.ext.dependencies["rxCache"]
-    implementation rootProject.ext.dependencies["Jolyglot-gson"]
+  implementation rootProject.ext.dependencies["rxCache"]
+  implementation rootProject.ext.dependencies["Jolyglot-gson"]
 
-    implementation rootProject.ext.dependencies["rxjava"]
-    implementation rootProject.ext.dependencies["rxandroid"]
-    implementation rootProject.ext.dependencies["rxbinding2"]
-    implementation rootProject.ext.dependencies["rxkotlin"]
-    implementation rootProject.ext.dependencies.rxlifecycle2
-    implementation rootProject.ext.dependencies.rxlifecomponents
+  implementation rootProject.ext.dependencies["rxjava"]
+  implementation rootProject.ext.dependencies["rxandroid"]
+  implementation rootProject.ext.dependencies["rxbinding2"]
+  implementation rootProject.ext.dependencies["rxkotlin"]
+  implementation rootProject.ext.dependencies.rxlifecycle2
+  implementation rootProject.ext.dependencies.rxlifecomponents
 
-    implementation rootProject.ext.dependencies["dagger"]
-    implementation rootProject.ext.dependencies["dagger-support"]
-    kapt rootProject.ext.dependencies["dagger-compiler"]
+  implementation rootProject.ext.dependencies["dagger"]
+  implementation rootProject.ext.dependencies["dagger-support"]
+  kapt rootProject.ext.dependencies["dagger-compiler"]
 
-    implementation rootProject.ext.dependencies["fragmentation"]
-    implementation rootProject.ext.dependencies["butterknife"]
-    implementation rootProject.ext.dependencies["butterknife-compiler"]
-    implementation rootProject.ext.dependencies["ultra-ptr"]
-    implementation rootProject.ext.dependencies["bottom-bar"]
-    implementation rootProject.ext.dependencies["BaseAdapterHelper"]
+  implementation rootProject.ext.dependencies["fragmentation"]
+  implementation rootProject.ext.dependencies["butterknife"]
+  implementation rootProject.ext.dependencies["butterknife-compiler"]
+  implementation rootProject.ext.dependencies["ultra-ptr"]
+  implementation rootProject.ext.dependencies["bottom-bar"]
+  implementation rootProject.ext.dependencies["BaseAdapterHelper"]
 
-    implementation rootProject.ext.dependencies["glide"]
-    implementation rootProject.ext.dependencies["banner"]
-    implementation rootProject.ext.dependencies["viewanimator"]
-    implementation rootProject.ext.dependencies["tablayout"]
-    implementation rootProject.ext.dependencies["FlycoDialog"]
-    implementation rootProject.ext.dependencies["richtext"]
-    implementation rootProject.ext.dependencies["transformations"]
-    implementation rootProject.ext.dependencies["PhotoView"]
-    implementation rootProject.ext.dependencies["videoplayer"]
-    implementation rootProject.ext.dependencies["lottie"]
-    implementation rootProject.ext.dependencies["progressbar"]
-    implementation rootProject.ext.dependencies["transitionhelper"]
-    implementation rootProject.ext.dependencies["swipebacklayout"]
-    implementation rootProject.ext.dependencies["gif-drawable"]
-    implementation rootProject.ext.dependencies["eventbus"]
-    implementation rootProject.ext.dependencies["litepal"]
-    implementation rootProject.ext.dependencies["retrolambda"]
+  implementation rootProject.ext.dependencies["glide"]
+  implementation rootProject.ext.dependencies["banner"]
+  implementation rootProject.ext.dependencies["viewanimator"]
+  implementation rootProject.ext.dependencies["tablayout"]
+  implementation rootProject.ext.dependencies["FlycoDialog"]
+  implementation rootProject.ext.dependencies["richtext"]
+  implementation rootProject.ext.dependencies["transformations"]
+  implementation rootProject.ext.dependencies["PhotoView"]
+  implementation rootProject.ext.dependencies["videoplayer"]
+  implementation rootProject.ext.dependencies["lottie"]
+  implementation rootProject.ext.dependencies["progressbar"]
+  implementation rootProject.ext.dependencies["transitionhelper"]
+  implementation rootProject.ext.dependencies["swipebacklayout"]
+  implementation rootProject.ext.dependencies["gif-drawable"]
+  implementation rootProject.ext.dependencies["eventbus"]
+  implementation rootProject.ext.dependencies["litepal"]
+  implementation rootProject.ext.dependencies["retrolambda"]
 
 
-    implementation rootProject.ext.dependencies["constraint-layout"]
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+
+
+  implementation rootProject.ext.dependencies["logger"]
+  implementation rootProject.ext.dependencies["leakcanary"]
+  implementation rootProject.ext.dependencies["canary-no-op"]
+  implementation project(":multiple-status-view")
+
+  implementation rootProject.ext.dependencies["constraint-layout"]
+  testImplementation 'junit:junit:4.12'
+  androidTestImplementation 'com.android.support.test:runner:1.0.1'
+  androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 }
